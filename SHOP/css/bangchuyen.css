@@ -1,0 +1,101 @@
+body {
+  background-color: #f1f6ff;
+}
+/* CSS */
+.owl-carousel .card {
+  position: relative;
+}
+
+.owl-carousel .card-details {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0; /* Ẩn nút chi tiết ban đầu */
+  transition: opacity 0.3s ease-in-out;
+}
+
+.owl-carousel .card:hover .card-details {
+  opacity: 1; /* Hiển thị nút chi tiết khi hover */
+}
+
+.text-center a {
+  font-size: 12px;
+  /* Tùy chỉnh khoảng cách giữa các nút nếu cần */
+}
+.owl-carousel .owl-item {
+  /* //padding các ô trong băng chuyền */
+  padding: 24px;
+}
+
+.owl-controls .owl-buttons {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.owl-controls .owl-buttons .owl-prev {
+  background: #fff;
+  position: absolute;
+  top: -13%;
+  left: 15px;
+  padding: 0 18px 0 15px;
+  border-radius: 50px;
+  box-shadow: 3px 14px 25px -10px #92b4d0;
+  transition: background 0.5s ease 0s;
+}
+
+.owl-controls .owl-buttons .owl-next {
+  background: #fff;
+  position: absolute;
+  top: -13%;
+  right: 15px;
+  padding: 0 15px 0 18px;
+  border-radius: 50px;
+  box-shadow: -3px 14px 25px -10px #92b4d0;
+  transition: background 0.5s ease 0s;
+}
+
+/* CSS để căn giữa nút prev và next */
+.owl-controls .owl-buttons {
+  text-align: center;
+  position: absolute;
+  top: 50%;
+  width: 100%;
+}
+
+.owl-controls .owl-buttons .owl-prev,
+.owl-controls .owl-buttons .owl-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.owl-controls .owl-buttons .owl-prev {
+  left: 0;
+}
+
+.owl-controls .owl-buttons .owl-next {
+  right: 0;
+}
+
+.owl-controls .owl-buttons .owl-prev:after,
+.owl-controls .owl-buttons .owl-next:after {
+  content: "\f104";
+  font-family: FontAwesome;
+  color: #333;
+  font-size: 30px;
+}
+
+.owl-controls .owl-buttons .owl-next:after {
+  content: "\f105";
+}
+
+@media only screen and (min-width: 768px) {
+  #news-slider2 .card {
+    margin-right: 20px; /* Adjust the value as needed */
+  }
+
+  #news-slider2 .card:last-child {
+    margin-right: 0; /* No margin for the last item */
+  }
+}
