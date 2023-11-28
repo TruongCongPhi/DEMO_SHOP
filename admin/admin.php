@@ -1,3 +1,20 @@
+<?php
+session_start();
+if ($_SESSION['admin'] == 1) {
+    if (isset($_POST['tro_lai'])) {
+        header('location: lich_su_don_hang.php');
+    }
+    if (isset($_POST['dang_xuat'])) {
+        session_unset();
+        session_destroy();
+        header('location: dang_nhap.php');
+    }
+} else {
+    header('location: dang_nhap.php');
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html>
 
@@ -27,7 +44,9 @@
                         <li><a href="#" class="nav-item nav-link active">Home</a></li>
                         <li><a href="them_san_pham.php" class="nav-item nav-link">Thêm Sản Phẩm</a></li>
                         <li><a href="lich_su_don_hang.php" class="nav-item nav-link">Đơn Hàng</a></li>
-                        <li><a href="#" class="nav-item nav-link">Vận Chuyển</a></li>
+                        <li><a href="quan_ly_san_pham.php" class="nav-item nav-link">Quản lý Sản phẩm</a></li>
+                        <li><a href="dang_nhap.php" class="nav-item nav-link">Đăng xuất</a></li>
+
                     </ul>
                 </div>
             </div>

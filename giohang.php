@@ -11,25 +11,50 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" />
     <!-- Google Fonts Roboto -->
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" />
     <!-- MDB -->
     <link rel="stylesheet" href="css/bootstrap-shopping-carts.min.css" />
     <style>
+        #color {
+            width: 20px;
+            height: 20px;
+            border-radius: 1000px;
+        }
+
+        #offcanvasWithBothOptions {
+            max-height: 100vh;
+            /* Thiết lập chiều cao tối đa cho giỏ hàng (80% chiều cao của viewport) */
+            overflow-y: auto;
+            /* Cho phép cuộn nếu nội dung vượt quá chiều cao tối đa */
+        }
+
+        .card.mt-auto {
+            position: sticky;
+            bottom: 0;
+            margin-top: auto;
+            /* Tự động di chuyển xuống dưới cùng */
+        }
+
+        /* Thêm một số định dạng khác tùy thuộc vào ý muốn của bạn */
+        .row.d-flex {
+            margin-bottom: 10px;
+        }
+
+        .btn-close {
+            cursor: pointer;
+        }
     </style>
 
 </head>
 
 <body>
     <form method="post" action="">
-        <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions"
-            aria-labelledby="offcanvasWithBothOptionsLabel">
+        <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions" aria-labelledby="offcanvasWithBothOptionsLabel">
             <div class="offcanvas-header">
                 <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel">
                     Giỏ hàng
                 </h5>
-                <button type="submit" name="close_update" class="btn-close" data-bs-dismiss="offcanvas"
-                    aria-label="Close"></button>
+                <button type="submit" name="close_update" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <?php
             include('connections/connectdb.php'); // Đảm bảo kết nối đến cơ sở dữ liệu
@@ -41,21 +66,29 @@
             if (isset($_SESSION['id'])) {
                 $userId = $_SESSION['id'];
                 // Lấy dữ liệu từ bảng gio_hang và san_pham
-                $sql = "SELECT gio_hang.id_gio_hang,gio_hang.so_luong, san_pham.ten_san_pham, san_pham.gia,san_pham.mau_sac, san_pham.hinh_anh, gio_hang.thoi_gian
-            FROM gio_hang
-            INNER JOIN san_pham ON gio_hang.id_san_pham = san_pham.id_san_pham 
-            WHERE gio_hang.id_nguoi_dung = $userId";
+                $sql = "SELECT gio_hang.id_gio_hang,gio_hang.so_luong, san_pham.ten_san_pham, san_pham.gia,gio_hang.mau_sac,gio_hang.kich_thuoc, san_pham.hinh_anh, gio_hang.thoi_gian
+                    FROM gio_hang
+                    INNER JOIN san_pham ON gio_hang.id_san_pham = san_pham.id_san_pham 
+                    WHERE gio_hang.id_nguoi_dung = $userId";
                 $result = $conn->query($sql);
 
+                $tong_tien = 0;
+
                 if ($result->num_rows > 0) {
-                    $count =1;
+                    $count = 1;
                     // Hiển thị sản phẩm từ giỏ hàng
                     while ($row = $result->fetch_assoc()) {
                         $id_gio_hang = $row['id_gio_hang'];
                         $mau_sac = $row['mau_sac'];
-                        require_once('function.php');
-                        $ten_mau_sac = getColorName($mau_sac);
+                        $sql = "SELECT * FROM mau_sac"; // Sắp xếp theo giá tăng dần
+                        $result2 = $conn->query($sql);
+                        if ($row2 = mysqli_fetch_assoc($result2)) {
+                            $ten_mau_sac = $row2['ten_mau_sac'];
+                        }
+
+
                         $so_luong = $row['so_luong'];
+                        $tong_tien += $so_luong * $row['gia'];
                         $gia = number_format($row['gia'], 0, '.', '.');
                         echo "<div class='row d-flex justify-content-center align-items-center'>
                 <div class='col-12'>
@@ -75,8 +108,12 @@
                                         </div>
                                         <!-- Hàng màu, kích thước -->
                                         <div class='col-12'>
-                                            <span class='text-muted border-end'>Size: M </span>
-                                            <span class='text-muted '>Color: {$ten_mau_sac}</span>
+                                            <div class='d-flex '>
+                                                <div id='color' class='me-1' style='background-color: {$row2['ma_mau_sac']}'></div>
+                                                <div class='text-muted me-2 '> {$ten_mau_sac}</div>
+                                                <div class='border me-2'></div>
+                                                <div class='text-muted '> {$row['kich_thuoc']} </div>
+                                            </div>
                                         </div>
 
                                         <!-- Hàng nút chỉnh số lượng -->
@@ -123,11 +160,19 @@
                 </div>
             </div>';
             } else {
-                echo '<div class="mt-auto card border-0 ">
-                <div class="card-body m-auto">
-                    <a href="don_hang.php?id_gio_hang=' . $id_gio_hang . '" class="btn btn-warning btn-block btn-lg">Thanh toán</a>
-                </div>
-            </div>';
+                echo '
+                
+                <div class="mt-auto card border-0 ">
+                    <div class="d-flex justify-content-between">
+                        <div class=" ms-2 fs-4 fw-1">Tạm tính:</div>
+                        <div class=" fs-4 fw-1">
+                            ' . number_format($tong_tien, 0, '.', '.') . "đ" . '
+                        </div>
+                    </div>
+                    <div class="card-body m-auto">
+                        <a href="don_hang.php?id_gio_hang=' . $id_gio_hang . '" class="btn btn-warning btn-block btn-lg">Thanh toán</a>
+                    </div>
+                </div>';
             }
 
 

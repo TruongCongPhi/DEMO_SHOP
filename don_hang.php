@@ -9,36 +9,35 @@ session_start();
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Đơn hàng</title>
     <style type="text/css">
-    ed,
-    to get the result that you can see in the preview selection body {
-        background: #eee;
-    }
+        body {
+            background: #eee;
+        }
 
-    .card {
-        box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
-    }
+        .card {
+            box-shadow: 0 20px 27px 0 rgb(0 0 0 / 5%);
+        }
 
-    .card {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        min-width: 0;
-        word-wrap: break-word;
-        background-color: #fff;
-        background-clip: border-box;
-        border: 0 solid rgba(0, 0, 0, .125);
-        border-radius: 1rem;
-    }
+        .card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            word-wrap: break-word;
+            background-color: #fff;
+            background-clip: border-box;
+            border: 0 solid rgba(0, 0, 0, .125);
+            border-radius: 1rem;
+        }
 
-    .text-reset {
-        --bs-text-opacity: 1;
-        color: inherit !important;
-    }
+        .text-reset {
+            --bs-text-opacity: 1;
+            color: inherit !important;
+        }
 
-    a {
-        color: #5465ff;
-        text-decoration: none;
-    }
+        a {
+            color: #5465ff;
+            text-decoration: none;
+        }
     </style>
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
     <!-- Bootstrap icons-->
@@ -50,9 +49,9 @@ session_start();
 
 <body>
     <?php
-  include 'includes/navbar.php';
-  include 'giohang.php'; ?>
-    <div class="container-fluid " style=" margin-top:200px"">
+    include 'includes/navbar.php';
+    include 'giohang.php'; ?>
+    <div class="container-fluid " style=" margin-top:100px"">
 
     <div class=" container">
         <!-- Title -->
@@ -78,69 +77,63 @@ session_start();
                         <table class="table table-borderless">
                             <tbody>
                                 <?php
-                  // don_hang.php
+                                // Lấy dữ liệu từ bảng gio_hang và san_pham
 
-                  // Include your database connection file
-                  include('connections/connectdb.php');
+                                if (isset($_GET['id_gio_hang'])) {
+                                    $id_gio_hang = $_GET['id_gio_hang'];
+                                    $userId = $_SESSION['id'];
 
-                  // Check if the id_gio_hang parameter is set in the URL
+                                    $sql = "SELECT gio_hang.id_gio_hang,gio_hang.so_luong, san_pham.ten_san_pham, san_pham.gia,gio_hang.mau_sac,gio_hang.kich_thuoc, san_pham.hinh_anh, gio_hang.thoi_gian
+                                        FROM gio_hang
+                                        INNER JOIN san_pham ON gio_hang.id_san_pham = san_pham.id_san_pham 
+                                        WHERE gio_hang.id_nguoi_dung = $userId";
+                                    $result = $conn->query($sql);
 
+                                    $tong_tien = 0;
 
+                                    if ($result->num_rows > 0) {
+                                        $count = 1;
+                                        // Hiển thị sản phẩm từ giỏ hàng
+                                        while ($row = $result->fetch_assoc()) {
+                                            $id_gio_hang = $row['id_gio_hang'];
+                                            $mau_sac = $row['mau_sac'];
+                                            $sql = "SELECT * FROM mau_sac"; // Sắp xếp theo giá tăng dần
+                                            $result2 = $conn->query($sql);
+                                            if ($row2 = mysqli_fetch_assoc($result2)) {
+                                                $ten_mau_sac = $row2['ten_mau_sac'];
+                                            }
+                                            $so_luong = $row['so_luong'];
+                                            $tong_sp = $so_luong * $row['gia'];
+                                            $tong_tien += $tong_sp;
+                                            $gia = number_format($row['gia'], 0, '.', '.');
 
-                  // Lấy dữ liệu từ bảng gio_hang và san_pham
-
-                  if (isset($_GET['id_gio_hang'])) {
-                    $id_gio_hang = $_GET['id_gio_hang'];
-                    $userId = $_SESSION['id'];
-
-                    // Fetch products related to the given id_gio_hang from the database
-                    $sql = "SELECT gio_hang.id_gio_hang, gio_hang.so_luong, san_pham.ten_san_pham, san_pham.gia, san_pham.mau_sac, san_pham.hinh_anh
-                          FROM gio_hang
-                          INNER JOIN san_pham ON gio_hang.id_san_pham = san_pham.id_san_pham 
-                          WHERE gio_hang.id_nguoi_dung = $userId";
-
-                    $result = $conn->query($sql);
-
-                    // Display the products in the order
-                    $tong = 0;
-                    if ($result->num_rows > 0) {
-                      while ($row = $result->fetch_assoc()) {
-                        $mau_sac = $row['mau_sac'];
-                        require_once('function.php');
-                        $ten_mau_sac = getColorName($mau_sac);
-                        $so_luong = $row['so_luong'];
-                        $tong_gia_sp = $so_luong * $row['gia'];
-                        $tong += $tong_gia_sp;
-
-                  ?>
-                                <tr>
-                                    <td>
-                                        <div class="d-flex mb-2">
-                                            <div class="flex-shrink-0">
-                                                <img src="uploads/<?= $row['hinh_anh'] ?>" alt="" width="35"
-                                                    class="img-fluid">
-                                            </div>
-                                            <div class="flex-lg-grow-1 ms-3">
-                                                <h6 class="small mb-0"><a href="#"
-                                                        class="text-reset"><?= $row['ten_san_pham'] ?></a></h6>
-                                                <span class="small">Màu: <?= $ten_mau_sac ?></span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td><?= $so_luong ?></td>
-                                    <td class="text-end"><?= number_format($tong_gia_sp, 0, '.', '.') ?></td>
-                                </tr>
+                                ?>
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex mb-2">
+                                                        <div class="flex-shrink-0">
+                                                            <img src="uploads/<?= $row['hinh_anh'] ?>" alt="" width="35" class="img-fluid">
+                                                        </div>
+                                                        <div class="flex-lg-grow-1 ms-3">
+                                                            <h6 class="small mb-0"><a href="#" class="text-reset"><?= $row['ten_san_pham'] ?></a></h6>
+                                                            <span class="small">Màu: <?= $ten_mau_sac ?></span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td><?= $so_luong ?></td>
+                                                <td class="text-end"><?= number_format($tong_sp, 0, '.', '.') ?></td>
+                                            </tr>
                                 <?php }
-                    }
-                  }
-                  ?>
+                                    }
+                                }
+                                ?>
                             </tbody>
                             <tfoot>
                                 <tr>
                                     <td colspan="2">
                                         <h5>Tổng sản phẩm</h5>
                                     </td>
-                                    <td class="text-end h5"><?= number_format($tong, 0, '.', '.') ?></td>
+                                    <td class="text-end h5"><?= number_format($tong_tien, 0, '.', '.') ?></td>
                                 </tr>
                                 <tr>
                                     <td colspan="2">Phí vận chuyển</td>
@@ -154,7 +147,7 @@ session_start();
                                     <td colspan="2">
                                         <h4>Tổng</h4>
                                     </td>
-                                    <td class="h4 text-end"><?= number_format($tong - 60000, 0, '.', '.') ?></td>
+                                    <td class="h4 text-end"><?= number_format($tong_tien - 60000, 0, '.', '.') ?></td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -167,8 +160,7 @@ session_start();
                 </div>
                 <div class="card my-5" style="margin-bottom: 50px;">
                     <div class="card-body text-center">
-                        <a href="thanh_toan.php?id_gio_hang=<?= $id_gio_hang ?>" type="button"
-                            class="btn btn-warning btn-block btn-lg">Thanh
+                        <a href="thanh_toan.php?id_gio_hang=<?= $id_gio_hang ?>" type="button" class="btn btn-warning btn-block btn-lg">Thanh
                             toán</a>
                     </div>
                 </div>
@@ -178,13 +170,28 @@ session_start();
             <div class="col-lg-4">
                 <!-- Customer Notes -->
                 <div class="card mb-4">
-                    <div class="card-body">
-                        <h3 class="h6">Ghi chú khách hàng</h3>
-                        <input name="name" style="height: 100px; width: 250px;" type="text" height="100"
-                            placeholder="ghi chú" required>
+                    <div class="input-group">
+                        <span class="input-group-text">Ghi chú</span>
+                        <textarea class="form-control" aria-label="With textarea"></textarea>
                     </div>
                 </div>
                 <div class="card mb-4">
+                    <?php if (isset($_SESSION['id'])) {
+                        $userId = $_SESSION['id'];
+
+                        // Thực hiện truy vấn SQL để lấy dữ liệu từ bảng nguoi_dung
+                        $selectQuery = "SELECT * FROM nguoi_dung WHERE id_nguoi_dung = $userId";
+                        $result = $conn->query($selectQuery);
+
+                        // Kiểm tra và gán dữ liệu vào biến $userData
+                        $userData = [];
+                        if ($result->num_rows > 0) {
+                            $userData = $result->fetch_assoc();
+                        }
+
+                        $dia_chi_parts = explode('/', $userData['dia_chi']);
+                    }
+                    ?>
                     <!-- Shipping information -->
                     <div class="card-body">
                         <h3 class="h6">Thông tin vận chuyển</h3>
@@ -194,9 +201,11 @@ session_start();
                         <h3 class="h6">Địa chỉ nhận hàng</h3>
                         <address>
                             <strong>...</strong><br>
-                            Xuân Thủy, Cầu Giấy, Hà Nội<br>
-                            <abbr title="Phone">SDT:</abbr> (123) 456-7890
+                            <?= $userData['dia_chi'] ?>
+                            <br>
+                            <abbr title="Phone">SDT:</abbr> 0<?= $userData['sdt'] ?>
                         </address>
+                        <p class="text-danger">Nếu sai vui lòng chỉnh sửa trong tài khoản của mình <a href="tai_khoan.php">Tại đây</a> </p>
                     </div>
                 </div>
             </div>

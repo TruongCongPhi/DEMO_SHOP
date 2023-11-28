@@ -10,34 +10,44 @@ if (isset($_SESSION['id'])) {
     $sl_gio_hang = (int) mysqli_fetch_assoc($result)["count"];
 }
 ?>
-<nav class="navbar navbar-expand-lg navbar-light px-2 fixed-top shadow  rounded-0" style="background-color:#e6e6e6;">
+<style>
+.navbar-nav a.nav-link.active {
+    border-bottom: 2px solid #000;
+    /* Màu sắc của dòng gạch dưới khi liên kết được chọn */
+}
+</style>
+<nav
+    class="navbar navbar-expand-lg navbar-light bg-light px-2 fixed-top shadow  rounded-0 border-bottom border-secondary-subtle">
     <div class="container px-4 px-lg-5">
         <a class="navbar-brand" href="trang_chu.php">
             <!-- logo web -->
-            <img src="img/logo.jpg" alt="Logo" width="60px" class="d-inline-block align-text-top">
-            <a href="trang_chu.php" class="navbar-brand mt-3 h1">FamilyShop</a>
+            <img src="img/logo.png" alt="Logo" width="60px" class="d-inline-block align-text-top">
+            <a href="trang_chu.php" class="navbar-brand mt-2 h1">FamilyShop</a>
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                <li class="nav-item fs-4 fw-medium p-2">
-                    <a class="nav-link active" aria-current="page" href="#!">Trang chủ</a>
+                <li class="nav-item fs-5 fw-medium p-2">
+                    <a class="nav-link" aria-current="page" href="trang_chu.php">Trang chủ</a>
                 </li>
-                <li class="nav-item fs-4 fw-medium p-2"><a class="nav-link" href="#!">Nam</a></li>
-                <li class="nav-item fs-4 fw-medium p-2"><a class="nav-link" href="#!">Nữ</a></li>
-                <li class="nav-item fs-4 fw-medium p-2"><a class="nav-link" href="#!">Trẻ em</a></li>
+                <li class="nav-item fs-5 fw-medium p-2"><a class="nav-link" href="trang_nam.php">Nam</a></li>
+                <li class="nav-item fs-5 fw-medium p-2"><a class="nav-link" href="trang_nu.php">Nữ</a></li>
+                <li class="nav-item fs-5 fw-medium p-2"><a class="nav-link" href="trang_tre_em.php">Trẻ em</a></li>
 
             </ul>
-            <form class="d-flex me-2" style="height: 38px;" role="search">
-                <input class="form-control" type="search" placeholder="Search" aria-label="Tìm kiếm">
-                <button class="btn btn-outline-success" style="width: 160px;" type="submit">Tìm kiếm </button>
+            <form class="d-flex me-4" role="search">
+                <input class="form-control me-1" type="search" placeholder="Nhập mặt hàng cần tìm"
+                    aria-label="Tìm kiếm">
+                <button class="btn btn-outline-success" type="submit">Search </button>
             </form>
 
             <!-- giỏ hàng -->
             <form class="d-flex me-2">
-                <button class="btn btn-outline-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">
+                <button class="btn btn-outline-dark" type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">
                     <i class="bi-cart-fill me-1"></i>
                     <span class="badge bg-dark text-white ms-1 rounded-pill"><?= $sl_gio_hang ?></span>
                 </button>
@@ -68,3 +78,19 @@ if (isset($_SESSION['id'])) {
     </div>
 
 </nav>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Lấy địa chỉ URL hiện tại
+    var currentURL = window.location.href;
+
+    // Lặp qua tất cả các liên kết trong thanh điều hướng
+    var navLinks = document.querySelectorAll('.navbar-nav a.nav-link');
+    navLinks.forEach(function(link) {
+        // So sánh địa chỉ URL hiện tại với href của từng liên kết
+        if (link.href === currentURL) {
+            // Nếu trùng khớp, thêm lớp 'active'
+            link.classList.add('active');
+        }
+    });
+});
+</script>
